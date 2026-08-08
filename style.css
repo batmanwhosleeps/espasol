@@ -2360,6 +2360,33 @@ opacity:.7;
 
 }
 
+/* ==============================
+   DESKTOP COLOR BOOST
+============================== */
+
+@media (min-width: 769px){
+
+    body{
+        background:#e9d8ff;
+    }
+
+    .landingPage{
+        background:linear-gradient(
+            180deg,
+            #eadcff,
+            #d9c2ff
+        );
+    }
+
+    .letterCard{
+        box-shadow:0 20px 50px rgba(90,45,150,.25);
+    }
+
+    .letterCard p{
+        color:#514565;
+    }
+
+}
 
 
 
