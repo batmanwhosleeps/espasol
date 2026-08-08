@@ -725,44 +725,133 @@ let dragging = false;
 
 function createGrid(){
 
-let grid = document.getElementById("wordGrid");
+    let grid = document.getElementById("wordGrid");
 
-grid.style.display = "grid";
-grid.style.gridTemplateColumns = "repeat(9,44px)";
-grid.style.gap = "5px";
+    grid.style.display = "grid";
+    grid.style.gridTemplateColumns = "repeat(9, 44px)";
+    grid.style.gap = "5px";
 
-document.addEventListener("mouseup", ()=>{
-  dragging = false;
-  clearSelection();
-});
+    // Prevent the page from scrolling while dragging on the puzzle
+    grid.style.touchAction = "none";
 
-for(let r=0;r<puzzle.length;r++){
-for(let c=0;c<puzzle[r].length;c++){
+    function stopDragging(){
+        dragging = false;
+        clearSelection();
+    }
 
-let box = document.createElement("button");
-box.innerHTML = puzzle[r][c];
-box.className = "letterBox";
+    // ==========================
+    // MOUSE
+    // ==========================
 
-box.onmousedown = function(e){
-  e.preventDefault();
-  if(box.classList.contains("found")) return;
-  dragging = true;
-  clearSelection();
-  addToSelection(box);
-};
+    document.addEventListener("mouseup", stopDragging);
 
-box.onmouseenter = function(){
-  if(!dragging) return;
-  if(box.classList.contains("found")) return;
-  addToSelection(box);
-};
+    // ==========================
+    // TOUCH
+    // ==========================
 
-grid.appendChild(box);
+    document.addEventListener("touchend", stopDragging);
+
+    document.addEventListener("touchcancel", stopDragging);
+
+    for(let r = 0; r < puzzle.length; r++){
+
+        for(let c = 0; c < puzzle[r].length; c++){
+
+            let box = document.createElement("button");
+
+            box.innerHTML = puzzle[r][c];
+            box.className = "letterBox";
+
+            // Prevent normal button behavior
+            box.type = "button";
+
+            // ==========================
+            // MOUSE DOWN
+            // ==========================
+
+            box.addEventListener("mousedown", function(e){
+
+                e.preventDefault();
+
+                if(box.classList.contains("found")) return;
+
+                dragging = true;
+
+                clearSelection();
+
+                addToSelection(box);
+
+            });
+
+            // ==========================
+            // MOUSE DRAG
+            // ==========================
+
+            box.addEventListener("mouseenter", function(){
+
+                if(!dragging) return;
+
+                if(box.classList.contains("found")) return;
+
+                addToSelection(box);
+
+            });
+
+            // ==========================
+            // PHONE TOUCH START
+            // ==========================
+
+            box.addEventListener("touchstart", function(e){
+
+                e.preventDefault();
+
+                if(box.classList.contains("found")) return;
+
+                dragging = true;
+
+                clearSelection();
+
+                addToSelection(box);
+
+            }, {passive:false});
+
+            // ==========================
+            // PHONE TOUCH MOVE
+            // ==========================
+
+            box.addEventListener("touchmove", function(e){
+
+                e.preventDefault();
+
+                if(!dragging) return;
+
+                let touch = e.touches[0];
+
+                let element = document.elementFromPoint(
+                    touch.clientX,
+                    touch.clientY
+                );
+
+                if(!element) return;
+
+                // If the element itself is a letter
+                if(element.classList.contains("letterBox")){
+
+                    if(element.classList.contains("found")) return;
+
+                    addToSelection(element);
+
+                }
+
+            }, {passive:false});
+
+            grid.appendChild(box);
+
+        }
+
+    }
+
 }
-}
-
-}
-
 function addToSelection(box){
   if(selectedBoxes.includes(box)) return;
   box.classList.add("selecting");
